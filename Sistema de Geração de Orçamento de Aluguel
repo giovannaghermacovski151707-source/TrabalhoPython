@@ -1,0 +1,63 @@
+class Imovel:
+    def __init__(self, tipo, quartos, garagem):
+        self.tipo = tipo
+        self.quartos = quartos
+        self.garagem = garagem
+
+    def calcular_valor(self):
+        valor_base = 1000
+        if self.tipo.lower() == "apartamento":
+            valor_base += 500
+        elif self.tipo.lower() == "casa":
+            valor_base += 800
+        elif self.tipo.lower() == "kitnet":
+            valor_base += 300
+
+        valor_base += self.quartos * 200
+
+        if self.garagem.lower() == "s":
+            valor_base += 300
+
+        return valor_base
+
+
+class Contrato:
+    def __init__(self, imovel, possui_criancas):
+        self.imovel = imovel
+        self.possui_criancas = possui_criancas
+
+    def calcular_valor_final(self):
+        valor = self.imovel.calcular_valor()
+        if self.possui_criancas.lower() == "s":
+            valor += 150
+        return valor
+
+    def gerar_parcelas(self):
+        import csv
+        valor_total = self.calcular_valor_final()
+        parcelas = 12
+        valor_parcela = valor_total / parcelas
+
+        with open("parcelas_aluguel.csv", mode="w", newline="") as arquivo:
+            escritor = csv.writer(arquivo)
+            escritor.writerow(["Parcela", "Valor"])
+            for i in range(1, parcelas + 1):
+                escritor.writerow([i, round(valor_parcela, 2)])
+
+        print("Arquivo 'parcelas_aluguel.csv' gerado com sucesso!")
+
+
+# Programa principal
+tipo = input("Tipo do imóvel (apartamento, casa, kitnet): ")
+quartos = int(input("Quantidade de quartos: "))
+garagem = input("Possui garagem? (s/n): ")
+
+imovel = Imovel(tipo, quartos, garagem)
+
+possui_criancas = input("Possui crianças? (s/n): ")
+
+contrato = Contrato(imovel, possui_criancas)
+valor_final = contrato.calcular_valor_final()
+
+print(f"Valor total do aluguel: R${valor_final:.2f}")
+contrato.gerar_parcelas()
